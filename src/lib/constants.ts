@@ -9,7 +9,6 @@ export const siteConfig = {
 export const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
-  { label: "Cart", href: "/cart" },
 ];
 
 export const sortOptions: { value: SortOption; label: string }[] = [

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import AddToCartButton from "@/components/AddToCartButton";
 import ProductCard from "@/components/ProductCard";
 import {
   getAllProducts,
@@ -82,13 +83,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               : `In stock (${product.stock} available)`}
           </p>
 
-          <button
-            type="button"
-            disabled={isOutOfStock}
-            className="mt-6 rounded-md bg-foreground px-6 py-3 text-sm font-medium text-background hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            Add to Cart
-          </button>
+          <AddToCartButton product={product} />
         </div>
       </div>
 

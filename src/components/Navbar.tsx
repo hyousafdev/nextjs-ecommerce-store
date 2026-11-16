@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CartLink from "@/components/CartLink";
 import { navLinks, siteConfig } from "@/lib/constants";
 
 export default function Navbar() {
@@ -16,6 +17,9 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+          <li>
+            <CartLink />
+          </li>
         </ul>
       </nav>
     </header>

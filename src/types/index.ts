@@ -23,3 +23,10 @@ export type Product = {
 };
 
 export type SortOption = "newest" | "price-asc" | "price-desc" | "rating";
+
+export type CartItem = Pick<
+  Product,
+  "id" | "slug" | "name" | "price" | "image" | "stock"
+> & {
+  quantity: number;
+};
