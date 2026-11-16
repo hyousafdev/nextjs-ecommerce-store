@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import type { FormEvent } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { sortOptions } from "@/lib/constants";
 import type { ProductCategory } from "@/types";
@@ -15,13 +14,37 @@ export default function ShopFilters({ categories }: ShopFiltersProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [search, setSearch] = useState(searchParams.get("q") ?? "");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const currentQuery = searchParams.get("q") ?? "";
   const currentCategory = searchParams.get("category") ?? "";
   const currentSort = searchParams.get("sort") ?? "newest";
 
-  function updateParams(updates: Record<string, string>) {
-    const params = new URLSearchParams(searchParams.toString());
+  // Keep the input in sync when the URL changes from outside
+  // (Back button, "Clear all filters" link), but not while the user is typing.
+  useEffect(() => {
+    if (timeoutRef.current !== null) {
+      return;
+    }
+    if (inputRef.current && inputRef.current.value.trim() !== currentQuery) {
+      inputRef.current.value = currentQuery;
+    }
+  }, [currentQuery]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  function updateParams(
+    updates: Record<string, string>,
+    method: "push" | "replace" = "push",
+  ) {
+    const params = new URLSearchParams(window.location.search);
 
     Object.entries(updates).forEach(([key, value]) => {
       if (value) {
@@ -32,17 +55,35 @@ export default function ShopFilters({ categories }: ShopFiltersProps) {
     });
 
     const query = params.toString();
-    router.push(query ? `${pathname}?${query}` : pathname);
+    const url = query ? `${pathname}?${query}` : pathname;
+
+    if (method === "replace") {
+      router.replace(url, { scroll: false });
+    } else {
+      router.push(url, { scroll: false });
+    }
   }
 
-  function handleSearch(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    updateParams({ q: search.trim() });
+  function handleSearchChange(value: string) {
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      timeoutRef.current = null;
+      updateParams({ q: value.trim() }, "replace");
+    }, 400);
   }
 
   function handleClear() {
-    setSearch("");
-    router.push(pathname);
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+    router.push(pathname, { scroll: false });
   }
 
   const categoryItems = [
@@ -52,22 +93,15 @@ export default function ShopFilters({ categories }: ShopFiltersProps) {
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleSearch} className="flex gap-2">
-        <input
-          type="search"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search products..."
-          aria-label="Search products"
-          className="w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-sm"
-        />
-        <button
-          type="submit"
-          className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90"
-        >
-          Search
-        </button>
-      </form>
+      <input
+        ref={inputRef}
+        type="search"
+        defaultValue={currentQuery}
+        onChange={(event) => handleSearchChange(event.target.value)}
+        placeholder="Search products..."
+        aria-label="Search products"
+        className="w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-sm"
+      />
 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap gap-2">
