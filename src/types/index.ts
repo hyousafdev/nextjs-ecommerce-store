@@ -21,3 +21,5 @@ export type Product = {
   stock: number;
   createdAt: string;
 };
+
+export type SortOption = "newest" | "price-asc" | "price-desc" | "rating";
