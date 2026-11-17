@@ -32,6 +32,23 @@ export async function generateMetadata({
   return {
     title: product.name,
     description: product.description,
+    alternates: {
+      canonical: `/shop/${product.slug}`,
+    },
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      url: `/shop/${product.slug}`,
+      type: "website",
+      images: [
+        {
+          url: product.image,
+          width: 600,
+          height: 600,
+          alt: product.name,
+        },
+      ],
+    },
   };
 }
 
@@ -46,8 +63,32 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const isOutOfStock = product.stock === 0;
   const related = getRelatedProducts(product.slug);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: product.image,
+    category: product.category,
+    offers: {
+      "@type": "Offer",
+      price: product.price,
+      priceCurrency: "USD",
+      availability: isOutOfStock
+        ? "https://schema.org/OutOfStock"
+        : "https://schema.org/InStock",
+    },
+  };
+
   return (
     <section className="mx-auto max-w-6xl px-4 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+
       <nav className="text-sm text-foreground/60">
         <Link href="/shop" className="hover:underline">
           Shop

@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NextShop: Next.js E-commerce Store
+
+A demo e-commerce store built with Next.js (App Router), TypeScript, Tailwind CSS and Redux Toolkit.
+
+Live demo: coming soon
+
+## Features
+
+- Shop page with live search, category filter and sorting (state kept in the URL)
+- Product detail pages with dynamic routes (`/shop/[slug]`) and static generation
+- Shopping cart with Redux Toolkit (add, remove, change quantity, stock limits)
+- Cart saved in `localStorage`, so it survives page refreshes
+- Checkout form with validation (React Hook Form + Zod)
+- Fake orders API built with a Route Handler (`POST /api/orders`) that validates data again on the server and recalculates prices
+- Order confirmation page
+- SEO: per-page metadata, Open Graph, canonical URLs, product structured data (JSON-LD), sitemap and robots.txt
+- Optimized images with `next/image`
+- Light and dark mode based on system preference
+
+## Tech Stack
+
+- [Next.js](https://nextjs.org/) (App Router, Turbopack, Cache Components)
+- [React](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Redux Toolkit](https://redux-toolkit.js.org/)
+- [React Hook Form](https://react-hook-form.com/) and [Zod](https://zod.dev/)
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+git clone https://github.com/hyousafdev/nextjs-ecommerce-store.git
+cd nextjs-ecommerce-store
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command         | Description                  |
+| --------------- | ---------------------------- |
+| `npm run dev`   | Start the development server |
+| `npm run build` | Create a production build    |
+| `npm run start` | Run the production build     |
+| `npm run lint`  | Run ESLint                   |
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/
+│   ├── api/orders/      # Fake orders API (Route Handler)
+│   ├── cart/
+│   ├── checkout/
+│   ├── order-success/
+│   ├── shop/
+│   │   └── [slug]/      # Product detail pages
+│   ├── layout.tsx
+│   ├── not-found.tsx
+│   ├── robots.ts
+│   └── sitemap.ts
+├── components/
+├── lib/                 # Products data, schemas, helpers
+├── store/               # Redux Toolkit store and cart slice
+└── types/
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- This is a demo project: no real payments are taken and orders are only kept in server memory.
+- Product images are random placeholders from picsum.photos.
 
-## Deploy on Vercel
+## Author
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Hassan Yousaf - [GitHub](https://github.com/hyousafdev)

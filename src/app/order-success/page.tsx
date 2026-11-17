@@ -5,6 +5,10 @@ import { Suspense } from "react";
 export const metadata: Metadata = {
   title: "Order confirmed",
   description: "Thank you for your order.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 type OrderSuccessPageProps = {

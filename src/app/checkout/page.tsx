@@ -4,6 +4,10 @@ import CheckoutForm from "@/components/CheckoutForm";
 export const metadata: Metadata = {
   title: "Checkout",
   description: "Enter your shipping details to place your order.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function CheckoutPage() {
