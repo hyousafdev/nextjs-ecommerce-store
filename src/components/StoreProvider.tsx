@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Provider } from "react-redux";
+import CartPersistence from "@/components/CartPersistence";
 import { makeStore } from "@/store/store";
 
 type StoreProviderProps = {
@@ -11,5 +12,10 @@ type StoreProviderProps = {
 export default function StoreProvider({ children }: StoreProviderProps) {
   const [store] = useState(() => makeStore());
 
-  return <Provider store={store}>{children}</Provider>;
+  return (
+    <Provider store={store}>
+      <CartPersistence />
+      {children}
+    </Provider>
+  );
 }

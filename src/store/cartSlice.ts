@@ -1,20 +1,26 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { CartItem, Product } from "@/types";
-import type { RootState } from "./store";
+import type { RootState } from "@/store/store";
 
 type CartState = {
   items: CartItem[];
+  isHydrated: boolean;
 };
 
 const initialState: CartState = {
   items: [],
+  isHydrated: false,
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+    hydrateCart(state, action: PayloadAction<CartItem[]>) {
+      state.items = action.payload;
+      state.isHydrated = true;
+    },
     addToCart(state, action: PayloadAction<Product>) {
       const product = action.payload;
       const existing = state.items.find((item) => item.id === product.id);
@@ -63,6 +69,7 @@ const cartSlice = createSlice({
 });
 
 export const {
+  hydrateCart,
   addToCart,
   removeFromCart,
   increaseQuantity,
@@ -73,6 +80,9 @@ export const {
 export default cartSlice.reducer;
 
 export const selectCartItems = (state: RootState) => state.cart.items;
+
+export const selectIsCartHydrated = (state: RootState) =>
+  state.cart.isHydrated;
 
 export const selectCartCount = (state: RootState) =>
   state.cart.items.reduce((total, item) => total + item.quantity, 0);

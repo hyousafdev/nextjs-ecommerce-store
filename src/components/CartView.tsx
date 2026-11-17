@@ -8,6 +8,7 @@ import {
   selectCartCount,
   selectCartItems,
   selectCartTotal,
+  selectIsCartHydrated,
 } from "@/store/cartSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
@@ -16,6 +17,11 @@ export default function CartView() {
   const items = useAppSelector(selectCartItems);
   const count = useAppSelector(selectCartCount);
   const total = useAppSelector(selectCartTotal);
+  const isHydrated = useAppSelector(selectIsCartHydrated);
+
+  if (!isHydrated) {
+    return <p className="mt-10 text-foreground/70">Loading your cart...</p>;
+  }
 
   if (items.length === 0) {
     return (
