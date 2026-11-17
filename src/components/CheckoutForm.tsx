@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/FormField";
@@ -9,21 +10,25 @@ import { checkoutSchema, countries } from "@/lib/checkoutSchema";
 import type { CheckoutFormValues } from "@/lib/checkoutSchema";
 import { formatPrice } from "@/lib/utils";
 import {
+  clearCart,
   selectCartItems,
   selectCartTotal,
   selectIsCartHydrated,
 } from "@/store/cartSlice";
-import { useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 const inputClass =
   "w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-sm aria-invalid:border-red-500";
 
 export default function CheckoutForm() {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const items = useAppSelector(selectCartItems);
   const total = useAppSelector(selectCartTotal);
   const isHydrated = useAppSelector(selectIsCartHydrated);
 
-  const [isValidated, setIsValidated] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [isOrderPlaced, setIsOrderPlaced] = useState(false);
 
   const {
     register,
@@ -55,12 +60,44 @@ export default function CheckoutForm() {
   }
 
   async function onSubmit(values: CheckoutFormValues) {
-    console.log("Checkout values:", values);
-    setIsValidated(true);
+    setServerError(null);
+
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer: values,
+          items: items.map((item) => ({
+            id: item.id,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setServerError(
+          data.error ?? "Something went wrong. Please try again.",
+        );
+        return;
+      }
+
+      setIsOrderPlaced(true);
+      dispatch(clearCart());
+      router.push(`/order-success?orderId=${encodeURIComponent(data.order.id)}`);
+    } catch {
+      setServerError("Network error. Please check your connection and try again.");
+    }
   }
 
   if (!isHydrated) {
     return <p className="mt-10 text-foreground/70">Loading your cart...</p>;
+  }
+
+  if (isOrderPlaced) {
+    return <p className="mt-10 text-foreground/70">Order placed! Redirecting...</p>;
   }
 
   if (items.length === 0) {
@@ -174,10 +211,12 @@ export default function CheckoutForm() {
           <textarea rows={3} {...fieldProps("notes")} />
         </FormField>
 
-        {isValidated && (
-          <p className="rounded-md border border-foreground/20 p-3 text-sm">
-            Your details are valid. Placing the order will be connected in the
-            next step.
+        {serverError && (
+          <p
+            role="alert"
+            className="rounded-md border border-red-500 p-3 text-sm text-red-500"
+          >
+            {serverError}
           </p>
         )}
 
@@ -186,7 +225,7 @@ export default function CheckoutForm() {
           disabled={isSubmitting}
           className="rounded-md bg-foreground px-6 py-3 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50"
         >
-          Place Order
+          {isSubmitting ? "Placing order..." : "Place Order"}
         </button>
       </form>
 
