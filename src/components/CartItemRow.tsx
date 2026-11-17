@@ -54,7 +54,8 @@ export default function CartItemRow({ item }: CartItemRowProps) {
               type="button"
               aria-label={`Decrease quantity of ${item.name}`}
               onClick={() => dispatch(decreaseQuantity(item.id))}
-              className="px-3 py-1 hover:bg-foreground/5"
+              disabled={item.quantity <= 1}
+              className="px-3 py-1 hover:bg-foreground/5 disabled:cursor-not-allowed disabled:opacity-40"
             >
               −
             </button>
