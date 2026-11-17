@@ -12,8 +12,12 @@ type StoreProviderProps = {
 export default function StoreProvider({ children }: StoreProviderProps) {
   const [store] = useState(() => makeStore());
 
+  // The state the server rendered with. Used only for the hydration render,
+  // so the first client render matches the server HTML.
+  const [initialState] = useState(() => store.getState());
+
   return (
-    <Provider store={store}>
+    <Provider store={store} serverState={initialState}>
       <CartPersistence />
       {children}
     </Provider>
